@@ -6,10 +6,11 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class Client1 {
-    static String[] servers = new String[]{"localhost:5000","localhost:5001","localhost:5002"};
+    static String[] servers = new String[]{"localhost:5000", "localhost:5001", "localhost:5002"};
     static ArrayList<String> files;
     static String path = "D:\\Code\\aos-pp-02-ra\\";
     static String citiesFile = "citiestexas.txt";
+    static long lamportClockValue = 0;
 
 
     public static void main(String[] args) throws IOException {
@@ -31,12 +32,13 @@ public class Client1 {
             try (Socket socket = new Socket(server, port)) {
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                long ts = System.currentTimeMillis();
-                String msg = "WRITE#1#" + ts + "#" + randomCity + "#" + files.get(randomIndex2);
+                String msg = "WRITE#1#" + (++lamportClockValue) + "#" + randomCity + "#" + files.get(randomIndex2);
                 dataOutputStream.writeInt(msg.length());
+                dataOutputStream.writeLong(lamportClockValue);
                 dataOutputStream.writeBytes(msg);
+                Thread.sleep(new Random().nextInt(10) * 1000);
                 //System.out.println(in.readLine());
-            } catch (UnknownHostException e) {
+            } catch (UnknownHostException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -53,9 +55,11 @@ public class Client1 {
         DataInputStream in = new DataInputStream(socket.getInputStream());
         String enquiry = "ENQUIRY";
         dataOutputStream.writeInt(enquiry.length());
+        dataOutputStream.writeLong(lamportClockValue);
         dataOutputStream.writeBytes(enquiry);
         while (true) {
             int length = in.readInt();
+            updatelamportsClock(in.readLong());
             if (length > 0) {
                 byte[] msg = new byte[length];
                 in.readFully(msg);
@@ -63,5 +67,10 @@ public class Client1 {
                 return new ArrayList<String>(Arrays.asList(filesInfo.split(",")));
             }
         }
+    }
+
+    private static void updatelamportsClock(long readLong) {
+        lamportClockValue++;
+        lamportClockValue = Math.max(readLong, lamportClockValue);
     }
 }

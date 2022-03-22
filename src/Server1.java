@@ -8,11 +8,16 @@ public class Server1 {
 
     static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt"));
     static String path = "D:\\Code\\aos-pp-02-ra\\Server1\\";
-    static Queue<Message> requestQueue = new LinkedList<>();
+
+    static PriorityQueue<Message> requestQueue;
+    static LamportsClock lamportsClock = new LamportsClock();
 
     public static void main(String[] args) throws IOException {
+        ClockComparator clockComparator = new ClockComparator();
+        requestQueue = new PriorityQueue<>(clockComparator);
         ServerSocket server = null;
         String filesInfo = files.stream().map(Object::toString).collect(Collectors.joining(","));
+        lamportsClock.clockValue = 0;
         QueueProcessor queueProcessor = new QueueProcessor(requestQueue);
         new Thread(queueProcessor).start();
         try {
@@ -21,8 +26,7 @@ public class Server1 {
             server.setReuseAddress(true);
             while (true) {
                 Socket client = server.accept();
-                System.out.println("New Client connected" + client.getInetAddress().getHostAddress());
-                ClientHandler clientHandler = new ClientHandler(client, requestQueue, filesInfo);
+                ClientHandler clientHandler = new ClientHandler(client, requestQueue, filesInfo, lamportsClock);
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {
