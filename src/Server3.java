@@ -13,7 +13,8 @@ public class Server3 {
     public static void main(String[] args) throws IOException {
         ServerSocket server = null;
         String filesInfo = files.stream().map(Object::toString).collect(Collectors.joining(","));
-
+        QueueProcessor queueProcessor= new QueueProcessor(requestQueue);
+        new Thread(queueProcessor).start();
         try {
             server = new ServerSocket(5002);
             System.out.println("Running Server 3 on port 5002");

@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class Client1 {
-    static String[] servers = new String[]{"localhost:5000"};
+    static String[] servers = new String[]{"localhost:5000","localhost:5001","localhost:5002"};
     static ArrayList<String> files;
     static String path = "D:\\Code\\aos-pp-02-ra\\";
     static String citiesFile = "citiestexas.txt";
@@ -35,7 +35,7 @@ public class Client1 {
                 String msg = "WRITE#1#" + ts + "#" + randomCity + "#" + files.get(randomIndex2);
                 dataOutputStream.writeInt(msg.length());
                 dataOutputStream.writeBytes(msg);
-                System.out.println(in.readLine());
+                //System.out.println(in.readLine());
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
