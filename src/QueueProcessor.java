@@ -1,22 +1,27 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class QueueProcessor implements Runnable {
-    Queue<Message> requestQueue;
+    PriorityQueue<Message> requestQueue;
+    String queueName;
 
-    public QueueProcessor(Queue<Message> requestQueue) {
+    public QueueProcessor(PriorityQueue<Message> requestQueue, String queueName) {
         this.requestQueue = requestQueue;
+        this.queueName = queueName;
     }
 
     public void run() {
-        int size = requestQueue.size();
         while (true) {
-            if (requestQueue.size() > size) {
-                System.out.println("Size is : " + requestQueue.size());
-                size = requestQueue.size();
-            }
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
+                if (requestQueue.size() > 0) {
+                    Message msg = requestQueue.peek();
+                    System.out.println(msg);
+                    msg.dataOutputStream.writeBytes("SUCESS");
+                    Thread.sleep(2000);
+                }
+            } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
         }
