@@ -31,6 +31,13 @@ public class ClientHandler implements Runnable {
                     System.out.println(filesInfo);
                     out.writeInt(filesInfo.length());
                     out.writeBytes(filesInfo);
+                } else if (messageTokens[0].equals("WRITE")) {
+                    Message msg = new Message();
+                    msg.clientId = Integer.parseInt(messageTokens[1]);
+                    msg.timeStamp = Long.parseLong(messageTokens[2]);
+                    msg.message = messageTokens[3];
+                    msg.fileName = messageTokens[4];
+                    msgQueue.add(msg);
                 }
             }
         } catch (IOException e) {

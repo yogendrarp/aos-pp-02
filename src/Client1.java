@@ -16,9 +16,6 @@ public class Client1 {
 
         files = getHostedFileInformation();
 
-        if (true) {
-            return;
-        }
         List<String> cities = Files.readAllLines(Path.of(path + citiesFile));
         for (int i = 0; i < 30; i++) {
             int serverCount = servers.length;
@@ -34,8 +31,10 @@ public class Client1 {
             try (Socket socket = new Socket(server, port)) {
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                dataOutputStream.writeInt(randomCity.length());
-                dataOutputStream.writeBytes("MSG:" + randomCity + "#FILE:" + files.get(randomIndex2));
+                long ts = System.currentTimeMillis();
+                String msg = "WRITE#1#" + ts + "#" + randomCity + "#" + files.get(randomIndex2);
+                dataOutputStream.writeInt(msg.length());
+                dataOutputStream.writeBytes(msg);
                 System.out.println(in.readLine());
             } catch (UnknownHostException e) {
                 e.printStackTrace();
@@ -56,7 +55,7 @@ public class Client1 {
         dataOutputStream.writeInt(enquiry.length());
         dataOutputStream.writeBytes(enquiry);
         while (true) {
-            int length=in.readInt();
+            int length = in.readInt();
             if (length > 0) {
                 byte[] msg = new byte[length];
                 in.readFully(msg);
