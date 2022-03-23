@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 public class Server3 {
 
     static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt"));
+    static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("localhost:5000", "localhost:5001"));
     static String path = "D:\\Code\\aos-pp-02-ra\\Server3\\";
     static HashSet<String> requests = new HashSet<>();
     static ArrayList<PriorityQueue<Message>> requestQueues = new ArrayList<PriorityQueue<Message>>();
@@ -22,7 +23,7 @@ public class Server3 {
         String filesInfo = files.stream().map(Object::toString).collect(Collectors.joining(","));
         lamportsClock.clockValue = 0;
         for (int i = 0; i < files.size(); i++) {
-            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server3" + files.get(i), requests);
+            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server3" + files.get(i), requests, otherServers);
             new Thread(queueProcessor).start();
         }
         try {

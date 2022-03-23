@@ -8,11 +8,13 @@ public class QueueProcessor implements Runnable {
     PriorityQueue<Message> requestQueue;
     String queueName;
     HashSet<String> requests;
+    ArrayList<String> otherServers;
 
-    public QueueProcessor(PriorityQueue<Message> requestQueue, String queueName, HashSet<String> requests) {
+    public QueueProcessor(PriorityQueue<Message> requestQueue, String queueName, HashSet<String> requests, ArrayList<String> otherServers) {
         this.requestQueue = requestQueue;
         this.queueName = queueName;
         this.requests = requests;
+        this.otherServers = otherServers;
     }
 
     public void run() {
@@ -20,12 +22,19 @@ public class QueueProcessor implements Runnable {
             try {
                 System.out.println(queueName + " size : " + requestQueue.size());
                 if (requestQueue.size() > 0) {
-                    System.out.println("Processing");
                     Message msg = requestQueue.peek();
                     System.out.println("processing " + msg);
+                    String msgString = "WRITE#" + msg.clientId + "#"
+                            + (++msg.timeStamp) + "#" + msg.message + "#" + msg.fileName;
+
+                    // TODO: 3/23/2022
+                    /*
+                     * Check other servers if this request can be processed
+                     * */
+
                     Thread.sleep(5000);
-                    requests.add("c:" + msg.clientId + ",f:" + msg.fileName);
-                    System.out.println("Hashset size is: "+requests.size());
+                    requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                    System.out.println("Hashset size is: " + requests.size());
                 }
                 Thread.sleep(3000);
             } catch (InterruptedException e) {

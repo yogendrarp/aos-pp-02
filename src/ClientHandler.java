@@ -48,16 +48,16 @@ public class ClientHandler implements Runnable {
                     lamportsClock.clockValue++;
                     boolean flag = true;
                     while (flag) {
-                        boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName);
+                        boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         if (containsData) {
                             flag = false;
-                            requests.remove("c:" + msg.clientId + ",f:" + msg.fileName);
+                            requests.remove("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         }
                     }
                     System.out.println("Coming out now, its processed");
-                    String successmsg = "SUCCESS";
-                    out.writeInt(successmsg.length());
-                    out.writeBytes(successmsg);
+                    String successMsg = "SUCCESS";
+                    out.writeInt(successMsg.length());
+                    out.writeBytes(successMsg);
                 }
             }
         } catch (IOException e) {
