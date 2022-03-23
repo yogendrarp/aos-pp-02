@@ -31,16 +31,17 @@ public class Client1 {
 
             try (Socket socket = new Socket(server, port)) {
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                DataInputStream in = new DataInputStream(socket.getInputStream());
                 String msg = "WRITE#1#" + (++lamportClockValue) + "#" + randomCity + "#" + files.get(randomIndex2);
                 dataOutputStream.writeInt(msg.length());
                 dataOutputStream.writeLong(lamportClockValue);
                 dataOutputStream.writeBytes(msg);
                 Thread.sleep(new Random().nextInt(4) * 1000);
                 while (true) {
-                    String line = in.readLine();
+                    String line = new String(in.readAllBytes());
                     if (line != null) {
                         System.out.println(line);
+                        break;
                     }
                 }
             } catch (UnknownHostException | InterruptedException e) {

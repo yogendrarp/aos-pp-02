@@ -10,9 +10,11 @@ public class Server1 {
     static String path = "D:\\Code\\aos-pp-02-ra\\Server1\\";
 
     static ArrayList<PriorityQueue<Message>> requestQueues = new ArrayList<PriorityQueue<Message>>();
+    static HashSet<String> requests = new HashSet<>();
     static LamportsClock lamportsClock = new LamportsClock();
 
     public static void main(String[] args) throws IOException {
+
         ClockComparator clockComparator = new ClockComparator();
         for (String f : files) {
             PriorityQueue<Message> priorityQueue = new PriorityQueue<>(clockComparator);
@@ -22,7 +24,7 @@ public class Server1 {
         String filesInfo = files.stream().map(Object::toString).collect(Collectors.joining(","));
         lamportsClock.clockValue = 0;
         for (int i = 0; i < files.size(); i++) {
-            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server1" + files.get(i));
+            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server1" + files.get(i), requests);
             new Thread(queueProcessor).start();
         }
         try {
@@ -31,7 +33,7 @@ public class Server1 {
             server.setReuseAddress(true);
             while (true) {
                 Socket client = server.accept();
-                ClientHandler clientHandler = new ClientHandler(client, requestQueues, filesInfo, lamportsClock);
+                ClientHandler clientHandler = new ClientHandler(client, requestQueues, filesInfo, lamportsClock, requests);
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {
