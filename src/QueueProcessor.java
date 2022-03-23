@@ -18,16 +18,17 @@ public class QueueProcessor implements Runnable {
     public void run() {
         while (true) {
             try {
+                System.out.println(queueName + " size : " + requestQueue.size());
                 if (requestQueue.size() > 0) {
                     System.out.println("Processing");
                     Message msg = requestQueue.peek();
-                    System.out.println(msg);
-                    System.out.println(msg.dataOutputStream);
-                    msg.dataOutputStream.writeBytes("SUCESS");
-                    Thread.sleep(20000);
-                    requests.remove("c:"+msg.clientId + ",f:" + msg.fileName);
+                    System.out.println("processing " + msg);
+                    Thread.sleep(5000);
+                    requests.add("c:" + msg.clientId + ",f:" + msg.fileName);
+                    System.out.println("Hashset size is: "+requests.size());
                 }
-            } catch (InterruptedException | IOException e) {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }

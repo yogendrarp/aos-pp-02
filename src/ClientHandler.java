@@ -42,19 +42,25 @@ public class ClientHandler implements Runnable {
                     msg.timeStamp = Long.parseLong(messageTokens[2]);
                     msg.message = messageTokens[3];
                     msg.fileName = messageTokens[4];
-                    msg.dataOutputStream = out;
                     int idx = getIndexOfFile(msg.fileName, filesInfo);
                     requestQueues.get(idx).add(msg);
-                    requests.add("c:"+msg.clientId + ",f:" + msg.fileName);
                     //System.out.println(msg);
                     lamportsClock.clockValue++;
-                    while (requests.contains("c:"+msg.clientId + ",f:" + msg.fileName)) {
-                        System.out.println("Contains");
-                        Thread.sleep(10000);
+                    boolean flag = true;
+                    while (flag) {
+                        boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName);
+                        if (containsData) {
+                            flag = false;
+                            requests.remove("c:" + msg.clientId + ",f:" + msg.fileName);
+                        }
                     }
+                    System.out.println("Coming out now, its processed");
+                    String successmsg = "SUCCESS";
+                    out.writeInt(successmsg.length());
+                    out.writeBytes(successmsg);
                 }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

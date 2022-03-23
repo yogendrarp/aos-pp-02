@@ -38,9 +38,11 @@ public class Client1 {
                 dataOutputStream.writeBytes(msg);
                 Thread.sleep(new Random().nextInt(4) * 1000);
                 while (true) {
-                    String line = new String(in.readAllBytes());
-                    if (line != null) {
-                        System.out.println(line);
+                    int length = in.readInt();
+                    if (length > 0) {
+                        byte[] successmsg = new byte[length];
+                        in.readFully(successmsg);
+                        System.out.println(new String(successmsg));
                         break;
                     }
                 }

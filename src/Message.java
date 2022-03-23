@@ -5,7 +5,6 @@ public class Message {
     String message;
     long timeStamp;
     String fileName;
-    DataOutputStream dataOutputStream;
 
     @Override
     public String toString() {
