@@ -10,7 +10,7 @@ public class Server2 {
     static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("localhost:5000", "localhost:5002"));
     static String path = "D:\\Code\\aos-pp-02-ra\\Server2\\";
     static HashSet<String> requests = new HashSet<>();
-
+    static ArrayList<Boolean> currReq = new ArrayList<>();
     static ArrayList<PriorityQueue<Message>> requestQueues = new ArrayList<PriorityQueue<Message>>();
     static LamportsClock lamportsClock = new LamportsClock();
 
@@ -24,7 +24,7 @@ public class Server2 {
         String filesInfo = files.stream().map(Object::toString).collect(Collectors.joining(","));
         lamportsClock.clockValue = 0;
         for (int i = 0; i < files.size(); i++) {
-            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server2" + files.get(i), requests, otherServers);
+            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server2" + files.get(i), requests, otherServers,currReq);
             new Thread(queueProcessor).start();
         }
         try {

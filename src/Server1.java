@@ -9,6 +9,7 @@ public class Server1 {
     static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt"));
     static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("localhost:5001", "localhost:5002"));
     static String path = "D:\\Code\\aos-pp-02-ra\\Server1\\";
+    static ArrayList<Boolean> currReq = new ArrayList<>();
 
     static ArrayList<PriorityQueue<Message>> requestQueues = new ArrayList<PriorityQueue<Message>>();
     static HashSet<String> requests = new HashSet<>();
@@ -20,12 +21,13 @@ public class Server1 {
         for (String f : files) {
             PriorityQueue<Message> priorityQueue = new PriorityQueue<>(clockComparator);
             requestQueues.add(priorityQueue);
+            currReq.add(false);
         }
         ServerSocket server = null;
         String filesInfo = files.stream().map(Object::toString).collect(Collectors.joining(","));
         lamportsClock.clockValue = 0;
         for (int i = 0; i < files.size(); i++) {
-            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server1" + files.get(i), requests,otherServers);
+            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server1" + files.get(i), requests, otherServers, currReq);
             new Thread(queueProcessor).start();
         }
         try {
