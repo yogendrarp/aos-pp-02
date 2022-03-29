@@ -9,6 +9,12 @@ public class ClockComparator implements Comparator<Message> {
         if (m1.timeStamp > m2.timeStamp) {
             return 1;
         }
+        if (m1.clientId < m2.clientId) {
+            return -1;
+        }
+        if (m1.clientId > m2.clientId) {
+            return 1;
+        }
         return 0;
     }
 }

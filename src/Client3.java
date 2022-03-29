@@ -31,12 +31,21 @@ public class Client3 {
 
             try (Socket socket = new Socket(server, port)) {
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                DataInputStream in = new DataInputStream(socket.getInputStream());
                 String msg = "WRITE#3#" + (++lamportClockValue) + "#" + randomCity + "#" + files.get(randomIndex2);
                 dataOutputStream.writeInt(msg.length());
+                dataOutputStream.writeLong(lamportClockValue);
                 dataOutputStream.writeBytes(msg);
-                Thread.sleep(new Random().nextInt(10) * 1000);
-                //System.out.println(in.readLine());
+                Thread.sleep(new Random().nextInt(4) * 1000);
+                while (true) {
+                    int length = in.readInt();
+                    if (length > 0) {
+                        byte[] successMsg = new byte[length];
+                        in.readFully(successMsg);
+                        System.out.println(new String(successMsg));
+                        break;
+                    }
+                }
             } catch (UnknownHostException | InterruptedException e) {
                 e.printStackTrace();
             }

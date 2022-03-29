@@ -5,6 +5,8 @@ public class Message {
     String message;
     long timeStamp;
     String fileName;
+    String type;
+    String proxyServer;
 
     @Override
     public String toString() {
@@ -13,6 +15,7 @@ public class Message {
                 ", message='" + message + '\'' +
                 ", timeStamp=" + timeStamp +
                 ", fileName='" + fileName + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 }

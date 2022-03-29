@@ -6,14 +6,14 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class Client1 {
-    static String[] servers = new String[]{"localhost:5000"};//, "localhost:5001", "localhost:5002"};
+    static String[] servers = new String[]{"localhost:5000", "localhost:5001", "localhost:5002"};
     static ArrayList<String> files;
     static String path = "D:\\Code\\aos-pp-02-ra\\";
     static String citiesFile = "citiestexas.txt";
     static long lamportClockValue = 0;
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         files = getHostedFileInformation();
 
@@ -40,15 +40,16 @@ public class Client1 {
                 while (true) {
                     int length = in.readInt();
                     if (length > 0) {
-                        byte[] successmsg = new byte[length];
-                        in.readFully(successmsg);
-                        System.out.println(new String(successmsg));
+                        byte[] successMsg = new byte[length];
+                        in.readFully(successMsg);
+                        System.out.println(new String(successMsg));
                         break;
                     }
                 }
             } catch (UnknownHostException | InterruptedException e) {
                 e.printStackTrace();
             }
+            Thread.sleep(3000);
         }
     }
 
