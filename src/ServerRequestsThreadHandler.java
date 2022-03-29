@@ -18,10 +18,10 @@ public class ServerRequestsThreadHandler implements Runnable {
     @Override
     public void run() {
         int idx1 = 0, idx2 = 1;
-        ServerRequests serverRequests1 = new ServerRequests(msg, servers.get(idx1), lamportsClock, obtainedLocks, idx1);
+        ServerRequests serverRequests1 = new ServerRequests(msg, servers.get(idx1), lamportsClock, obtainedLocks, idx1,idx2);
         Thread server1 = new Thread(serverRequests1);
 
-        ServerRequests serverRequests2 = new ServerRequests(msg, servers.get(idx2), lamportsClock, obtainedLocks, idx2);
+        ServerRequests serverRequests2 = new ServerRequests(msg, servers.get(idx2), lamportsClock, obtainedLocks, idx2,idx1);
         Thread server2 = new Thread(serverRequests2);
         try {
             server1.start();

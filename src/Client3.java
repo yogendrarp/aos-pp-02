@@ -40,9 +40,9 @@ public class Client3 {
                 while (true) {
                     int length = in.readInt();
                     if (length > 0) {
-                        byte[] successmsg = new byte[length];
-                        in.readFully(successmsg);
-                        System.out.println(new String(successmsg));
+                        byte[] successMsg = new byte[length];
+                        in.readFully(successMsg);
+                        System.out.println(new String(successMsg));
                         break;
                     }
                 }

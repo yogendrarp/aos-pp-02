@@ -12,13 +12,15 @@ public class ServerRequests implements Runnable {
     long lamportClockValue;
     boolean[] obtainedLocks;
     int idx;
+    int othIdx;
 
-    public ServerRequests(String msg, String server,long lamportClockValue,boolean[] obtainedLocks,int idx) {
+    public ServerRequests(String msg, String server, long lamportClockValue, boolean[] obtainedLocks, int idx, int othIdx) {
         this.msg = msg;
         this.server = server;
-        this.lamportClockValue=lamportClockValue;
-        this.obtainedLocks=obtainedLocks;
-        this.idx=idx;
+        this.lamportClockValue = lamportClockValue;
+        this.obtainedLocks = obtainedLocks;
+        this.idx = idx;
+        this.othIdx = othIdx;
     }
 
     @Override
@@ -39,6 +41,16 @@ public class ServerRequests implements Runnable {
                     byte[] successMsg = new byte[length];
                     in.readFully(successMsg);
                     System.out.println(new String(successMsg));
+                    this.obtainedLocks[idx] = true;
+                    break;
+                }
+            }
+            while (true) {
+                if (this.obtainedLocks[idx] && this.obtainedLocks[othIdx]){
+                    String obtainedAlllocks="OBTAINEDALLLOCKS";
+                    dataOutputStream.writeInt(obtainedAlllocks.length());
+                    dataOutputStream.writeLong(lamportClockValue);
+                    dataOutputStream.writeBytes(obtainedAlllocks);
                     break;
                 }
             }

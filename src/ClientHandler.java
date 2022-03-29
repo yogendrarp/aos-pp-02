@@ -74,17 +74,24 @@ public class ClientHandler implements Runnable {
                     while (flag) {
                         boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         if (containsData) {
-                            flag = false;
-                            //Send request back to the stream and enquire if it obtained a lock from other
-
-
+                            //Send request back to the stream and enquire if it obtained a lock from other server and then write to file.
+                            System.out.println("Other Server request can be processed, handing over the lock");
+                            String successMsg = "LOCK";
+                            out.writeInt(successMsg.length());
+                            out.writeBytes(successMsg);
+                            while (true) {
+                                length = 0;
+                                length = in.readInt();
+                                if (length > 0) {
+                                    byte[] successmsg = new byte[length];
+                                    in.readFully(successmsg);
+                                    System.out.println(new String(successmsg));
+                                    break;
+                                }
+                            }
                             requests.remove("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         }
                     }
-                    System.out.println("Other Server request can be processed, handing over the lock");
-                    String successMsg = "LOCK";
-                    out.writeInt(successMsg.length());
-                    out.writeBytes(successMsg);
                 } else if (messageTokens[0].equals("FINALWRITE")) {
                     Message msg = new Message();
                     msg.type = "FINALWRITE";
