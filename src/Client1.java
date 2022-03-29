@@ -13,7 +13,7 @@ public class Client1 {
     static long lamportClockValue = 0;
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         files = getHostedFileInformation();
 
@@ -49,6 +49,7 @@ public class Client1 {
             } catch (UnknownHostException | InterruptedException e) {
                 e.printStackTrace();
             }
+            Thread.sleep(3000);
         }
     }
 

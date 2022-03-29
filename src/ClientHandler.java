@@ -8,6 +8,7 @@ public class ClientHandler implements Runnable {
     private final String filesInfo;
     private final LamportsClock lamportsClock;
     private final HashSet<String> requests;
+    private final String lockStatus = "HOLD";
 
     public ClientHandler(Socket socket, ArrayList<PriorityQueue<Message>> queue, String filesInfo, LamportsClock lamportsClock, HashSet<String> requests) {
         this.clientSocket = socket;
@@ -38,6 +39,7 @@ public class ClientHandler implements Runnable {
                     out.writeBytes(filesInfo);
                 } else if (messageTokens[0].equals("WRITE")) {
                     Message msg = new Message();
+                    msg.type = "WRITE";
                     msg.clientId = Integer.parseInt(messageTokens[1]);
                     msg.timeStamp = Long.parseLong(messageTokens[2]);
                     msg.message = messageTokens[3];
@@ -56,6 +58,53 @@ public class ClientHandler implements Runnable {
                     }
                     System.out.println("Coming out now, its processed");
                     String successMsg = "SUCCESS";
+                    out.writeInt(successMsg.length());
+                    out.writeBytes(successMsg);
+                } else if (messageTokens[0].equals("SERVER")) {
+                    Message msg = new Message();
+                    msg.type = "SERVER";
+                    msg.clientId = Integer.parseInt(messageTokens[1]);
+                    msg.timeStamp = Long.parseLong(messageTokens[2]);
+                    msg.message = messageTokens[3];
+                    msg.fileName = messageTokens[4];
+                    int idx = getIndexOfFile(msg.fileName, filesInfo);
+                    requestQueues.get(idx).add(msg);
+                    lamportsClock.clockValue++;
+                    boolean flag = true;
+                    while (flag) {
+                        boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                        if (containsData) {
+                            flag = false;
+                            //Send request back to the stream and enquire if it obtained a lock from other
+
+
+                            requests.remove("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                        }
+                    }
+                    System.out.println("Other Server request can be processed, handing over the lock");
+                    String successMsg = "LOCK";
+                    out.writeInt(successMsg.length());
+                    out.writeBytes(successMsg);
+                } else if (messageTokens[0].equals("FINALWRITE")) {
+                    Message msg = new Message();
+                    msg.type = "FINALWRITE";
+                    msg.clientId = Integer.parseInt(messageTokens[1]);
+                    msg.timeStamp = Long.parseLong(messageTokens[2]);
+                    msg.message = messageTokens[3];
+                    msg.fileName = messageTokens[4];
+                    int idx = getIndexOfFile(msg.fileName, filesInfo);
+                    requestQueues.get(idx).add(msg);
+                    lamportsClock.clockValue++;
+                    boolean flag = true;
+                    while (flag) {
+                        boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                        if (containsData) {
+                            flag = false;
+                            requests.remove("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                        }
+                    }
+                    System.out.println("Other Server request has been processed");
+                    String successMsg = "WRITTEN_ACK";
                     out.writeInt(successMsg.length());
                     out.writeBytes(successMsg);
                 }

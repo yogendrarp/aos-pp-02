@@ -1,17 +1,48 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Random;
+
 public class ServerRequests implements Runnable {
 
-    int sleep;
+    String msg;
+    String server;
+    long lamportClockValue;
+    boolean[] obtainedLocks;
+    int idx;
 
-    public ServerRequests(int time) {
-        sleep = time;
+    public ServerRequests(String msg, String server,long lamportClockValue,boolean[] obtainedLocks,int idx) {
+        this.msg = msg;
+        this.server = server;
+        this.lamportClockValue=lamportClockValue;
+        this.obtainedLocks=obtainedLocks;
+        this.idx=idx;
     }
 
     @Override
     public void run() {
-        try {
-            System.out.println("I am a thread and I sleep");
-            Thread.sleep(sleep * 1000);
-        } catch (InterruptedException e) {
+        String _server = server.split(":")[0];
+        int port = Integer.parseInt(server.split(":")[1]);
+        try (Socket socket = new Socket(_server, port)) {
+            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            dataOutputStream.writeInt(msg.length());
+            dataOutputStream.writeLong(lamportClockValue);
+            dataOutputStream.writeBytes(msg);
+            Thread.sleep(new Random().nextInt(4) * 1000);
+            while (true) {
+                int length = in.readInt();
+                System.out.println("Waiting for the response");
+                if (length > 0) {
+                    byte[] successMsg = new byte[length];
+                    in.readFully(successMsg);
+                    System.out.println(new String(successMsg));
+                    break;
+                }
+            }
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
