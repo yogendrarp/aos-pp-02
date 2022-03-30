@@ -6,19 +6,19 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class Client3 {
-    static String[] servers = new String[]{"localhost:5000", "localhost:5001", "localhost:5002"};
+    static String[] servers = new String[]{"localhost:5000", "localhost:5001", "localhost:5002" };
     static ArrayList<String> files;
     static String path = "D:\\Code\\aos-pp-02-ra\\";
     static String citiesFile = "citiestexas.txt";
     static long lamportClockValue = 0;
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         files = getHostedFileInformation();
 
         List<String> cities = Files.readAllLines(Path.of(path + citiesFile));
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 10; i++) {
             int serverCount = servers.length;
             int filesCount = files.size();
             int randomIndex1 = new Random().nextInt((serverCount));
@@ -33,6 +33,7 @@ public class Client3 {
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 DataInputStream in = new DataInputStream(socket.getInputStream());
                 String msg = "WRITE#3#" + (++lamportClockValue) + "#" + randomCity + "#" + files.get(randomIndex2);
+                System.out.println("Sending " + msg + " to " + server + ":" + port);
                 dataOutputStream.writeInt(msg.length());
                 dataOutputStream.writeLong(lamportClockValue);
                 dataOutputStream.writeBytes(msg);
@@ -49,6 +50,7 @@ public class Client3 {
             } catch (UnknownHostException | InterruptedException e) {
                 e.printStackTrace();
             }
+            Thread.sleep(3000);
         }
     }
 

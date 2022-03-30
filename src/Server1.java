@@ -27,7 +27,7 @@ public class Server1 {
         String filesInfo = files.stream().map(Object::toString).collect(Collectors.joining(","));
         lamportsClock.clockValue = 0;
         for (int i = 0; i < files.size(); i++) {
-            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server1" + files.get(i), requests, otherServers, currReq);
+            QueueProcessor queueProcessor = new QueueProcessor(requestQueues.get(i), "Server1" + files.get(i), requests, otherServers, currReq, path + files.get(i));
             new Thread(queueProcessor).start();
         }
         try {
@@ -36,7 +36,7 @@ public class Server1 {
             server.setReuseAddress(true);
             while (true) {
                 Socket client = server.accept();
-                ClientHandler clientHandler = new ClientHandler(client, requestQueues, filesInfo, lamportsClock, requests);
+                ClientHandler clientHandler = new ClientHandler(client, requestQueues, filesInfo, lamportsClock, requests, path);
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {

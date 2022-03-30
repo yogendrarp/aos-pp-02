@@ -11,13 +11,15 @@ public class QueueProcessor implements Runnable {
     ArrayList<String> otherServers;
     ArrayList<Boolean> currReq;
     private final boolean[] obtainedLocks = new boolean[]{false, false};
+    String fullFilePath;
 
-    public QueueProcessor(PriorityQueue<Message> requestQueue, String queueName, HashSet<String> requests, ArrayList<String> otherServers, ArrayList<Boolean> currReq) {
+    public QueueProcessor(PriorityQueue<Message> requestQueue, String queueName, HashSet<String> requests, ArrayList<String> otherServers, ArrayList<Boolean> currReq, String fullFilePath) {
         this.requestQueue = requestQueue;
         this.queueName = queueName;
         this.requests = requests;
         this.otherServers = otherServers;
         this.currReq = currReq;
+        this.fullFilePath = fullFilePath;
     }
 
     public void run() {
@@ -40,6 +42,8 @@ public class QueueProcessor implements Runnable {
                             sRqTHThread.start();
                             sRqTHThread.join();
                             //Write To file
+                            System.out.println("**** " + msg);
+                            FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                             requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         } else if (obtainedLocks[0] && obtainedLocks[1]) {
                             // TODO: 3/28/2022 Write Directly
@@ -51,6 +55,7 @@ public class QueueProcessor implements Runnable {
                             sRqTHThread.start();
                             sRqTHThread.join();
                             System.out.println("**** " + msg);
+                            FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                             requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         }
                     } else if (msg.type.equals("SERVER")) {
@@ -66,6 +71,7 @@ public class QueueProcessor implements Runnable {
                         }
                         //Process msg as final write... now you dont have locks.. but you can only write once.
                         System.out.println("**** " + msg);
+                        FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                     }
                 }
                 Thread.sleep(3000);

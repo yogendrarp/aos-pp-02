@@ -9,13 +9,15 @@ public class ClientHandler implements Runnable {
     private final LamportsClock lamportsClock;
     private final HashSet<String> requests;
     private final String lockStatus = "HOLD";
+    private final String path;
 
-    public ClientHandler(Socket socket, ArrayList<PriorityQueue<Message>> queue, String filesInfo, LamportsClock lamportsClock, HashSet<String> requests) {
+    public ClientHandler(Socket socket, ArrayList<PriorityQueue<Message>> queue, String filesInfo, LamportsClock lamportsClock, HashSet<String> requests, String path) {
         this.clientSocket = socket;
         this.requestQueues = queue;
         this.filesInfo = filesInfo;
         this.lamportsClock = lamportsClock;
         this.requests = requests;
+        this.path = path;
     }
 
     public void run() {
@@ -113,6 +115,7 @@ public class ClientHandler implements Runnable {
                     }*/
                     System.out.println("Other Server request has been processed");
                     System.out.println("**** " + msg);
+                    FileWriter.AppendToFile(path + msg.fileName, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                     String successMsg = "WRITTEN_ACK";
                     out.writeInt(successMsg.length());
                     //out.writeLong(++lamportsClock.clockValue);
