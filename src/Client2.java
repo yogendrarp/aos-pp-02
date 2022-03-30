@@ -18,7 +18,7 @@ public class Client2 {
         files = getHostedFileInformation();
 
         List<String> cities = Files.readAllLines(Path.of(path + citiesFile));
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 30; i++) {
             int serverCount = servers.length;
             int filesCount = files.size();
             int randomIndex1 = new Random().nextInt((serverCount));

@@ -74,7 +74,7 @@ public class QueueProcessor implements Runnable {
                         FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                     }
                 }
-                Thread.sleep(3000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

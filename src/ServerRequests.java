@@ -54,7 +54,7 @@ public class ServerRequests implements Runnable {
             }
             while (flag) {
                 System.out.println(this.obtainedLocks[idx] + " " + this.obtainedLocks[othIdx]);
-                Thread.sleep(2000);
+                Thread.sleep(3000);
                 if (this.obtainedLocks[idx] && this.obtainedLocks[othIdx]) {
                     System.out.println("Have obtained both locks");
                     String obtainedAlllocks = "OBTAINEDALLLOCKS";
