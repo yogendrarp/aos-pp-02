@@ -28,6 +28,7 @@ public class ServerRequestsThreadHandler implements Runnable {
             server2.start();
             server1.join();
             server2.join();
+            System.out.println("Both the threads finished exec");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

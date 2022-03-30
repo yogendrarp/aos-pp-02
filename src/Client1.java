@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class Client1 {
-    static String[] servers = new String[]{"localhost:5000", "localhost:5001", "localhost:5002"};
+    static String[] servers = new String[]{"localhost:5000", "localhost:5001", "localhost:5002" };
     static ArrayList<String> files;
     static String path = "D:\\Code\\aos-pp-02-ra\\";
     static String citiesFile = "citiestexas.txt";
@@ -33,6 +33,7 @@ public class Client1 {
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 DataInputStream in = new DataInputStream(socket.getInputStream());
                 String msg = "WRITE#1#" + (++lamportClockValue) + "#" + randomCity + "#" + files.get(randomIndex2);
+                System.out.println("Sending " + msg + " to " + server + ":" + port);
                 dataOutputStream.writeInt(msg.length());
                 dataOutputStream.writeLong(lamportClockValue);
                 dataOutputStream.writeBytes(msg);

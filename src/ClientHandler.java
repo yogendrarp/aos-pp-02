@@ -46,7 +46,7 @@ public class ClientHandler implements Runnable {
                     msg.fileName = messageTokens[4];
                     int idx = getIndexOfFile(msg.fileName, filesInfo);
                     requestQueues.get(idx).add(msg);
-                    //System.out.println(msg);
+                    System.out.println("Received msg from " + msg);
                     lamportsClock.clockValue++;
                     boolean flag = true;
                     while (flag) {
@@ -82,6 +82,7 @@ public class ClientHandler implements Runnable {
                             while (true) {
                                 length = 0;
                                 length = in.readInt();
+                                long lcClock = in.readLong();
                                 if (length > 0) {
                                     byte[] successmsg = new byte[length];
                                     in.readFully(successmsg);
@@ -99,7 +100,7 @@ public class ClientHandler implements Runnable {
                     msg.timeStamp = Long.parseLong(messageTokens[2]);
                     msg.message = messageTokens[3];
                     msg.fileName = messageTokens[4];
-                    int idx = getIndexOfFile(msg.fileName, filesInfo);
+                    /*int idx = getIndexOfFile(msg.fileName, filesInfo);
                     requestQueues.get(idx).add(msg);
                     lamportsClock.clockValue++;
                     boolean flag = true;
@@ -109,11 +110,14 @@ public class ClientHandler implements Runnable {
                             flag = false;
                             requests.remove("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         }
-                    }
+                    }*/
                     System.out.println("Other Server request has been processed");
+                    System.out.println("**** " + msg);
                     String successMsg = "WRITTEN_ACK";
                     out.writeInt(successMsg.length());
+                    //out.writeLong(++lamportsClock.clockValue);
                     out.writeBytes(successMsg);
+                    System.out.println("Wrote everything, I am done here");
                 }
             }
         } catch (IOException e) {

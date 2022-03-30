@@ -41,13 +41,23 @@ public class ServerRequests implements Runnable {
                     byte[] successMsg = new byte[length];
                     in.readFully(successMsg);
                     System.out.println(new String(successMsg));
+                    System.out.println("Obtained lock from" + server + " " + port);
                     this.obtainedLocks[idx] = true;
                     break;
                 }
             }
-            while (true) {
-                if (this.obtainedLocks[idx] && this.obtainedLocks[othIdx]){
-                    String obtainedAlllocks="OBTAINEDALLLOCKS";
+            boolean flag = true;
+            System.out.println(msg);
+            if (msg.startsWith("FINALWRITE")) {
+                System.out.println("Msg starts with");
+                flag = false;
+            }
+            while (flag) {
+                System.out.println(this.obtainedLocks[idx] + " " + this.obtainedLocks[othIdx]);
+                Thread.sleep(2000);
+                if (this.obtainedLocks[idx] && this.obtainedLocks[othIdx]) {
+                    System.out.println("Have obtained both locks");
+                    String obtainedAlllocks = "OBTAINEDALLLOCKS";
                     dataOutputStream.writeInt(obtainedAlllocks.length());
                     dataOutputStream.writeLong(lamportClockValue);
                     dataOutputStream.writeBytes(obtainedAlllocks);
