@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Server1 {
 
-    static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt"));
+    static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt", "F4.txt", "F5.txt", "F6.txt", "F7.txt", "F8.txt"));
     static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("localhost:5001", "localhost:5002"));
     static String path = "D:\\Code\\aos-pp-02-ra\\Server1\\";
     static ArrayList<Boolean> currReq = new ArrayList<>();
