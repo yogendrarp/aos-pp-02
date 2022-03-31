@@ -13,14 +13,16 @@ public class ServerRequests implements Runnable {
     boolean[] obtainedLocks;
     int idx;
     int othIdx;
+    boolean[] aborted;
 
-    public ServerRequests(String msg, String server, long lamportClockValue, boolean[] obtainedLocks, int idx, int othIdx) {
+    public ServerRequests(String msg, String server, long lamportClockValue, boolean[] obtainedLocks, int idx, int othIdx, boolean[] aborted) {
         this.msg = msg;
         this.server = server;
         this.lamportClockValue = lamportClockValue;
         this.obtainedLocks = obtainedLocks;
         this.idx = idx;
         this.othIdx = othIdx;
+        this.aborted = aborted;
     }
 
     @Override
@@ -33,7 +35,6 @@ public class ServerRequests implements Runnable {
             dataOutputStream.writeInt(msg.length());
             dataOutputStream.writeLong(lamportClockValue);
             dataOutputStream.writeBytes(msg);
-            Thread.sleep(new Random().nextInt(4) * 1000);
             while (true) {
                 int length = in.readInt();
                 System.out.println("Waiting for the response");
@@ -46,15 +47,14 @@ public class ServerRequests implements Runnable {
                     break;
                 }
             }
-            boolean flag = true;
             System.out.println(msg);
             if (msg.startsWith("FINALWRITE")) {
                 System.out.println("Msg starts with");
-                flag = false;
+                return;
             }
-            while (flag) {
-                System.out.println(this.obtainedLocks[idx] + " " + this.obtainedLocks[othIdx]);
-                Thread.sleep(3000);
+            int count = 0;
+            while (count < 5) {
+                Thread.sleep(1000);
                 if (this.obtainedLocks[idx] && this.obtainedLocks[othIdx]) {
                     System.out.println("Have obtained both locks");
                     String obtainedAlllocks = "OBTAINEDALLLOCKS";
@@ -63,7 +63,13 @@ public class ServerRequests implements Runnable {
                     dataOutputStream.writeBytes(obtainedAlllocks);
                     break;
                 }
+                count++;
             }
+            String[] msgs = msg.split("#");
+            int time = Integer.parseInt(msgs[1]) * Integer.parseInt(msgs[2]);
+            System.out.println("Couldnt obtain locks, adding back to queue " + time);
+            Thread.sleep(time * 100);
+            this.aborted[idx] = true;
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }

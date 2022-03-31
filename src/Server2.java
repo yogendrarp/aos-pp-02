@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Server2 {
 
-    static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt", "F4.txt", "F5.txt", "F6.txt", "F7.txt", "F8.txt"));
+    static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt","F2.txt", "F3.txt", "F4.txt", "F5.txt", "F6.txt", "F7.txt", "F8.txt"));
     static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("localhost:5000", "localhost:5002"));
     static String path = "D:\\Code\\aos-pp-02-ra\\Server2\\";
     static HashSet<String> requests = new HashSet<>();

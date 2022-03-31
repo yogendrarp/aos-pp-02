@@ -36,30 +36,44 @@ public class QueueProcessor implements Runnable {
                         /*
                          * Check other servers if this request can be processed
                          * */
-                        if (!obtainedLocks[0] || !obtainedLocks[1]) {
-                            ServerRequestsThreadHandler serverRequestsThreadHandler = new ServerRequestsThreadHandler(msgString, otherServers, lamportsClock, obtainedLocks);
-                            Thread sRqTHThread = new Thread(serverRequestsThreadHandler);
-                            sRqTHThread.start();
-                            sRqTHThread.join();
-                            //Write To file
-                            System.out.println("**** " + msg);
-                            FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
-                            requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
-                        } else if (obtainedLocks[0] && obtainedLocks[1]) {
+
+                        if (obtainedLocks[0] && obtainedLocks[1]) {
                             // TODO: 3/28/2022 Write Directly
                             //Process msg as FINAL WRITE.. have the locks.. optimization bit
                             System.out.println("______Have both the locks, proceeding to finalwrite_____");
                             msgString = msgString.replace("SERVER", "FINALWRITE");
-                            ServerRequestsThreadHandler serverRequestsThreadHandler = new ServerRequestsThreadHandler(msgString, otherServers, lamportsClock, obtainedLocks);
+                            RequestState state = new RequestState();
+                            state.aborted = false;
+                            ServerRequestsThreadHandler serverRequestsThreadHandler = new ServerRequestsThreadHandler(msgString, otherServers, lamportsClock, obtainedLocks, state);
                             Thread sRqTHThread = new Thread(serverRequestsThreadHandler);
                             sRqTHThread.start();
                             sRqTHThread.join();
-                            System.out.println("**** " + msg);
-                            FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
-                            requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                            if (state.aborted) {
+                                requestQueue.add(msg);
+                            } else {
+                                System.out.println("**** " + msg);
+                                FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
+                                requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                            }
+                        } else {// if (!obtainedLocks[0] || !obtainedLocks[1]) {
+                            RequestState state = new RequestState();
+                            state.aborted = false;
+                            ServerRequestsThreadHandler serverRequestsThreadHandler = new ServerRequestsThreadHandler(msgString, otherServers, lamportsClock, obtainedLocks, state);
+                            Thread sRqTHThread = new Thread(serverRequestsThreadHandler);
+                            sRqTHThread.start();
+                            sRqTHThread.join();
+                            if (state.aborted) {
+                                requestQueue.add(msg);
+                            } else {
+                                //Write To file
+                                System.out.println("**** " + msg);
+                                FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
+                                requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                            }
                         }
                     } else if (msg.type.equals("SERVER")) {
                         System.out.println("processing " + msg);
+
                         obtainedLocks[0] = false;
                         obtainedLocks[1] = false;
                         boolean flag = true;
@@ -70,11 +84,12 @@ public class QueueProcessor implements Runnable {
                             //Wait Till the Request Has been removed, queue cannot proceed further after handing over the lock.
                         }
                         //Process msg as final write... now you dont have locks.. but you can only write once.
+                        Thread.sleep(2000);
                         System.out.println("**** " + msg);
                         FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                     }
                 }
-                Thread.sleep(5000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
