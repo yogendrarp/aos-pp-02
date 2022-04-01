@@ -1,0 +1,4 @@
+0, 0, Dallas
+0, 0, Austin
+0, 0, San Antonio
+0, 0, Houston

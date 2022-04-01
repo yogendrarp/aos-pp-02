@@ -1,4 +1,16 @@
-San Fransisco
-San Jose
-Palo Alto
-Santa Cruz
+0, 0, San Fransisco
+0, 0, San Jose
+0, 0, Palo Alto
+0, 0, Santa Cruz
+3, 6, Orange Grove
+3, 7, Tahoka
+2, 14, Lake City
+3, 17, Yoakum
+3, 21, Hedley
+2, 22, Mount Calm
+3, 25, Graham
+1, 23, Alvarado
+1, 25, Lakeway
+2, 26, Green Valley Farms
+1, 32, Rio Bravo
+2, 34, Marlin

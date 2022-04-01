@@ -1,0 +1,17 @@
+0, 0, Prague
+0, 0, Vienna
+0, 0, Budapest
+0, 0, Berlin
+3, 4, Forney
+3, 11, Orange
+3, 19, Murillo
+2, 19, Trinity
+1, 19, Venus
+1, 20, Ralls
+3, 23, Elkhart
+2, 25, Batesville
+3, 31, Dodd City
+1, 28, Los Ybanez
+1, 30, Texas City
+2, 28, Brenham
+2, 32, Copperas Cove

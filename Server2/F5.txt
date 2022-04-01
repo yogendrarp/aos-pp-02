@@ -1,0 +1,12 @@
+0, 0, Beijing
+0, 0, Shangai
+0, 0, Wuhan
+3, 3, Franklin
+2, 5, Crystal City
+1, 12, Anahuac
+1, 16, Ivanhoe
+1, 18, Pittsburg
+2, 21, Sunset Acres
+3, 27, Wharton
+1, 29, Mila Doce
+2, 29, Amada Acres

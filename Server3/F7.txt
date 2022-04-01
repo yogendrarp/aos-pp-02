@@ -1,0 +1,12 @@
+0, 0, Dallas
+0, 0, Austin
+0, 0, San Antonio
+0, 0, Houston
+2, 6, Leary
+1, 10, Liberty Hill
+3, 24, Gorman
+3, 28, Post
+3, 30, Fort Stockton
+3, 29, Rancho Banquete
+1, 26, Jolly
+1, 31, Cactus
