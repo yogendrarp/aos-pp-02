@@ -1,0 +1,4 @@
+0, 0, NewYork
+0, 0, Albany
+0, 0, Rochester
+0, 0, Buffalo

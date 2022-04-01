@@ -1,0 +1,15 @@
+0, 0, Delhi
+0, 0, Bangalore
+0, 0, Mumbai
+0, 0, Hyderabad
+1, 5, League City
+1, 8, Pleak
+1, 9, Clarksville City
+2, 13, Fort Stockton
+2, 15, Creedmoor
+1, 15, Grape Creek
+2, 18, Andrews
+1, 21, Indian Hills
+1, 22, Shavano Park
+2, 24, Glenn Heights
+3, 32, Trenton

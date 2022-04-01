@@ -1,0 +1,13 @@
+0, 0, Tokyo
+0, 0, Hokaido
+0, 0, Hiroshima
+0, 0, Nagasaki
+3, 9, La Feria
+2, 9, Cedar Park
+3, 14, Slaton
+2, 12, Valley View
+1, 13, Fort Clark Springs
+1, 14, Trophy Club
+3, 20, Bayview
+1, 27, Lucas
+2, 31, Teague

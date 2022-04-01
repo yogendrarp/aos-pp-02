@@ -1,4 +1,16 @@
-NewYork
-Albany
-Rochester
-Buffalo
+0, 0, NewYork
+0, 0, Albany
+0, 0, Rochester
+0, 0, Buffalo
+1, 4, Presidio
+2, 8, Nederland
+3, 8, Rhome
+1, 7, China
+2, 10, Ranchitos East
+2, 11, Fort Hancock
+3, 15, La Puerta
+1, 11, Windthorst
+2, 16, Kerrville
+3, 22, Victoria
+2, 23, Midway North
+3, 26, Red Lick

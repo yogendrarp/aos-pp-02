@@ -1,0 +1,4 @@
+0, 0, Tokyo
+0, 0, Hokaido
+0, 0, Hiroshima
+0, 0, Nagasaki

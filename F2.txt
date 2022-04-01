@@ -1,0 +1,4 @@
+0, 0, San Fransisco
+0, 0, San Jose
+0, 0, Palo Alto
+0, 0, Santa Cruz
