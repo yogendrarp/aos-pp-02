@@ -1,5 +1,9 @@
 import java.util.Comparator;
 
+/**
+ * Lamports clock comparator, compare the timestamps, if the timestamps are equal
+ * then compare the client Id, used in priority queue
+ */
 public class ClockComparator implements Comparator<Message> {
     @Override
     public int compare(Message m1, Message m2) {

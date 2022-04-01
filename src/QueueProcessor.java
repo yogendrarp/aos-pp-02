@@ -1,12 +1,14 @@
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.PriorityQueue;
-import java.util.Queue;
 
+/**
+ * Every File has its own queue, Each queue runs as thread on each server
+ */
 public class QueueProcessor implements Runnable {
     PriorityQueue<Message> requestQueue;
     String queueName;
+    //Processed requests used for message passing
     HashSet<String> requests;
     ArrayList<String> otherServers;
     ArrayList<Boolean> currReq;
@@ -27,6 +29,7 @@ public class QueueProcessor implements Runnable {
             try {
                 if (requestQueue.size() > 0) {
                     Message msg = requestQueue.poll();
+                    //Handle Write requests from clients directly
                     if (msg.type.equals("WRITE")) {
                         System.out.println("processing " + msg);
                         String msgString = "SERVER#" + msg.clientId + "#"
@@ -34,31 +37,34 @@ public class QueueProcessor implements Runnable {
                         long lamportsClock = msg.timeStamp;
                         // TODO: 3/23/2022
                         /*
-                         * Check other servers if this request can be processed
+                         * Check other servers if this request can be processed, Mutex
                          * */
                         if (!obtainedLocks[0] || !obtainedLocks[1]) {
                             ServerRequestsThreadHandler serverRequestsThreadHandler = new ServerRequestsThreadHandler(msgString, otherServers, lamportsClock, obtainedLocks);
                             Thread sRqTHThread = new Thread(serverRequestsThreadHandler);
                             sRqTHThread.start();
-                            //sRqTHThread.join();
                             //Write To file
                             System.out.println("**** " + msg);
                             FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                             requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         } else if (obtainedLocks[0] && obtainedLocks[1]) {
                             // TODO: 3/28/2022 Write Directly
-                            //Process msg as FINAL WRITE.. have the locks.. optimization bit
+                            /**
+                             * Process msg as FINAL WRITE.. have the locks.. optimization bit, if already the locks are acquired then
+                             * Roucairol and Carvalho optimization
+                             */
                             System.out.println("______Have both the locks, proceeding to finalwrite_____");
                             msgString = msgString.replace("SERVER", "FINALWRITE");
                             ServerRequestsThreadHandler serverRequestsThreadHandler = new ServerRequestsThreadHandler(msgString, otherServers, lamportsClock, obtainedLocks);
+                            //Though you have the locks, you must still inform other servers that you have msg to be written
                             Thread sRqTHThread = new Thread(serverRequestsThreadHandler);
                             sRqTHThread.start();
-                            //sRqTHThread.join();
                             System.out.println("**** " + msg);
                             FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                             requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         }
-                    } else if (msg.type.equals("SERVER")) {
+                    }//Handle proxy requests
+                    else if (msg.type.equals("SERVER")) {
                         System.out.println("processing " + msg);
                         obtainedLocks[0] = false;
                         obtainedLocks[1] = false;
@@ -74,10 +80,11 @@ public class QueueProcessor implements Runnable {
                         FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                     }
                 } else {
+                    // to avoid java consuming up all resources
                     Thread.sleep(5000);
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println(e.getLocalizedMessage());
             }
         }
     }

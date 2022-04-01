@@ -5,8 +5,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Server2 {
-
+    //List of All hosted Files
     static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt", "F4.txt", "F5.txt", "F6.txt", "F7.txt", "F8.txt"));
+    //Servers are aware of other two servers
     static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("localhost:5000", "localhost:5002"));
     static String path = "D:\\Code\\aos-pp-02-ra\\Server2\\";
     static HashSet<String> requests = new HashSet<>();
@@ -15,6 +16,7 @@ public class Server2 {
     static LamportsClock lamportsClock = new LamportsClock();
 
     public static void main(String[] args) throws IOException {
+        //Compare clocks see comments in the respective class
         ClockComparator clockComparator = new ClockComparator();
         for (String f : files) {
             PriorityQueue<Message> priorityQueue = new PriorityQueue<>(clockComparator);
@@ -33,7 +35,7 @@ public class Server2 {
             server.setReuseAddress(true);
             while (true) {
                 Socket client = server.accept();
-                ClientHandler clientHandler = new ClientHandler(client, requestQueues, filesInfo, lamportsClock, requests,path);
+                ClientHandler clientHandler = new ClientHandler(client, requestQueues, filesInfo, lamportsClock, requests, path);
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {

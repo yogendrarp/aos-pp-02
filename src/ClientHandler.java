@@ -38,23 +38,27 @@ public class ClientHandler implements Runnable {
                 in.readFully(line);
                 System.out.println(new String(line));
                 String[] messageTokens = new String(line).split("#");
+                // Handle enquiry, send hosted file information
                 if (messageTokens[0].equals("ENQUIRY")) {
                     lamportsClock.clockValue++;
                     out.writeInt(filesInfo.length());
                     out.writeLong(lamportsClock.clockValue);
                     out.writeBytes(filesInfo);
-                } else if (messageTokens[0].equals("WRITE")) {
+                }//When a client sends a request directly
+                else if (messageTokens[0].equals("WRITE")) {
                     Message msg = new Message();
                     msg.type = "WRITE";
                     msg.clientId = Integer.parseInt(messageTokens[1]);
                     msg.timeStamp = Long.parseLong(messageTokens[2]);
                     msg.message = messageTokens[3];
                     msg.fileName = messageTokens[4];
+                    //Get the file name where it has to be written and add to appropriate queue
                     int idx = getIndexOfFile(msg.fileName, filesInfo);
                     requestQueues.get(idx).add(msg);
                     System.out.println("Received msg from " + msg);
                     lamportsClock.clockValue++;
                     boolean flag = true;
+                    //Use hashset to understand if the request has been processed from the queue, if yes send ack to client
                     while (flag) {
                         boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         if (containsData) {
@@ -66,7 +70,8 @@ public class ClientHandler implements Runnable {
                     String successMsg = "SUCCESS";
                     out.writeInt(successMsg.length());
                     out.writeBytes(successMsg);
-                } else if (messageTokens[0].equals("SERVER")) {
+                }//Manage requests that come from other servers, i.e proxies
+                else if (messageTokens[0].equals("SERVER")) {
                     Message msg = new Message();
                     msg.type = "SERVER";
                     msg.clientId = Integer.parseInt(messageTokens[1]);
@@ -85,10 +90,11 @@ public class ClientHandler implements Runnable {
                             String successMsg = "LOCK";
                             out.writeInt(successMsg.length());
                             out.writeBytes(successMsg);
+                            long lcClock;
                             while (true) {
                                 length = 0;
                                 length = in.readInt();
-                                long lcClock = in.readLong();
+                                lcClock = in.readLong();
                                 if (length > 0) {
                                     byte[] successmsg = new byte[length];
                                     in.readFully(successmsg);
@@ -99,36 +105,26 @@ public class ClientHandler implements Runnable {
                             requests.remove("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         }
                     }
-                } else if (messageTokens[0].equals("FINALWRITE")) {
+                }//If the proxy server has acquired locks, then it sends this as final write, so write directly
+                else if (messageTokens[0].equals("FINALWRITE")) {
                     Message msg = new Message();
                     msg.type = "FINALWRITE";
                     msg.clientId = Integer.parseInt(messageTokens[1]);
                     msg.timeStamp = Long.parseLong(messageTokens[2]);
                     msg.message = messageTokens[3];
                     msg.fileName = messageTokens[4];
-                    /*int idx = getIndexOfFile(msg.fileName, filesInfo);
-                    requestQueues.get(idx).add(msg);
-                    lamportsClock.clockValue++;
-                    boolean flag = true;
-                    while (flag) {
-                        boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
-                        if (containsData) {
-                            flag = false;
-                            requests.remove("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
-                        }
-                    }*/
+
                     System.out.println("Other Server request has been processed");
                     System.out.println("**** " + msg);
+                    //Append to the file as part of sync
                     FileWriter.AppendToFile(path + msg.fileName, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                     String successMsg = "WRITTEN_ACK";
                     out.writeInt(successMsg.length());
-                    //out.writeLong(++lamportsClock.clockValue);
                     out.writeBytes(successMsg);
-                    System.out.println("Wrote everything, I am done here");
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+           System.out.println(e.getMessage());
         } finally {
             try {
                 in.close();
@@ -140,6 +136,12 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Get Index of the file from filename
+     * @param fileName
+     * @param filesInfo
+     * @return index
+     */
     private int getIndexOfFile(String fileName, String filesInfo) {
         String[] split = filesInfo.split(",");
         int index = 0;

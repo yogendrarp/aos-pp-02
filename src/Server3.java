@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 public class Server3 {
 
     static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt", "F4.txt", "F5.txt", "F6.txt", "F7.txt", "F8.txt"));
+    //Servers are aware of other two servers
     static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("localhost:5000", "localhost:5001"));
     static String path = "D:\\Code\\aos-pp-02-ra\\Server3\\";
     static HashSet<String> requests = new HashSet<>();
@@ -15,6 +16,7 @@ public class Server3 {
     static ArrayList<Boolean> currReq = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
+        //Compare clocks see comments in the respective class
         ClockComparator clockComparator = new ClockComparator();
         for (String f : files) {
             PriorityQueue<Message> priorityQueue = new PriorityQueue<>(clockComparator);

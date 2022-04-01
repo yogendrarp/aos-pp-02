@@ -2,8 +2,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Random;
 
+/**
+ * Check with other server
+ */
 public class ServerRequests implements Runnable {
 
     String msg;
@@ -36,6 +38,10 @@ public class ServerRequests implements Runnable {
             dataOutputStream.writeBytes(msg);
 
             while (true) {
+                /**
+                 *Connect to one of the servers and inform that it has to write
+                 * once approved, send the facilitate that it has acquired both the servers permission
+                 */
                 int length = in.readInt();
                 System.out.println("Waiting for the response");
                 if (length > 0) {
@@ -47,28 +53,16 @@ public class ServerRequests implements Runnable {
                     break;
                 }
             }
-            boolean flag = true;
-            System.out.println(msg);
-            if (msg.startsWith("FINALWRITE")) {
-                System.out.println("Msg starts with");
-                flag = false;
-            }
-            //while (flag) {
-            System.out.println(this.obtainedLocks[idx] + " " + this.obtainedLocks[othIdx]);
             String[] msgs = msg.split("#");
             int time = Integer.parseInt(msgs[1]) * Integer.parseInt(msgs[2]);
             Thread.sleep(time * 100);
-            //if (this.obtainedLocks[idx] && this.obtainedLocks[othIdx]) {
             System.out.println("Have obtained both locks");
             String obtainedAlllocks = "OBTAINEDALLLOCKS";
             dataOutputStream.writeInt(obtainedAlllocks.length());
             dataOutputStream.writeLong(lamportClockValue);
             dataOutputStream.writeBytes(obtainedAlllocks);
-            // break;
-            //}
-            // }
         } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         } finally {
             try {
                 dataOutputStream.close();
