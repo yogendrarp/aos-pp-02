@@ -18,7 +18,7 @@ public class Client1 {
         files = getHostedFileInformation();
 
         List<String> cities = Files.readAllLines(Path.of(path + citiesFile));
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 15; i++) {
             int serverCount = servers.length;
             int filesCount = files.size();
             int randomIndex1 = new Random().nextInt((serverCount));
@@ -43,7 +43,12 @@ public class Client1 {
                     if (length > 0) {
                         byte[] successMsg = new byte[length];
                         in.readFully(successMsg);
-                        System.out.println(new String(successMsg));
+                        String _msg=new String(successMsg);
+                        if(_msg.equalsIgnoreCase("SUCCESS")){
+                            System.out.println(new String(successMsg));
+                        }else {
+                            System.out.println("DEFERRED");
+                        }
                         break;
                     }
                 }

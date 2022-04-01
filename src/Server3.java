@@ -1,3 +1,4 @@
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -6,10 +7,10 @@ import java.util.stream.Collectors;
 
 public class Server3 {
 
-    static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt", "F4.txt", "F5.txt", "F6.txt", "F7.txt", "F8.txt"));
+    static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt", "F4.txt"));
     static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("localhost:5000", "localhost:5001"));
     static String path = "D:\\Code\\aos-pp-02-ra\\Server3\\";
-    static HashSet<String> requests = new HashSet<>();
+    static HashMap<String,Boolean> requests = new HashMap<>();
     static ArrayList<PriorityQueue<Message>> requestQueues = new ArrayList<PriorityQueue<Message>>();
     static LamportsClock lamportsClock = new LamportsClock();
     static ArrayList<Boolean> currReq = new ArrayList<>();
@@ -33,7 +34,8 @@ public class Server3 {
             server.setReuseAddress(true);
             while (true) {
                 Socket client = server.accept();
-                ClientHandler clientHandler = new ClientHandler(client, requestQueues, filesInfo, lamportsClock, requests, path );
+                RequestState state = new RequestState();
+                ClientHandler clientHandler = new ClientHandler(client, requestQueues, filesInfo, lamportsClock, requests, path, state);
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {

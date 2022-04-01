@@ -35,7 +35,9 @@ public class ServerRequests implements Runnable {
             dataOutputStream.writeInt(msg.length());
             dataOutputStream.writeLong(lamportClockValue);
             dataOutputStream.writeBytes(msg);
-            while (true) {
+            int localcount = 0;
+            boolean found = false;
+            while (localcount < 10) {
                 int length = in.readInt();
                 System.out.println("Waiting for the response");
                 if (length > 0) {
@@ -44,34 +46,49 @@ public class ServerRequests implements Runnable {
                     System.out.println(new String(successMsg));
                     System.out.println("Obtained lock from" + server + " " + port);
                     this.obtainedLocks[idx] = true;
+                    found = true;
                     break;
                 }
+                localcount++;
+                Thread.sleep(2000);
             }
-            System.out.println(msg);
-            if (msg.startsWith("FINALWRITE")) {
-                System.out.println("Msg starts with");
-                return;
-            }
-            int count = 0;
-            while (count < 5) {
-                Thread.sleep(1000);
-                if (this.obtainedLocks[idx] && this.obtainedLocks[othIdx]) {
-                    System.out.println("Have obtained both locks");
-                    String obtainedAlllocks = "OBTAINEDALLLOCKS";
-                    dataOutputStream.writeInt(obtainedAlllocks.length());
-                    dataOutputStream.writeLong(lamportClockValue);
-                    dataOutputStream.writeBytes(obtainedAlllocks);
-                    break;
+            System.out.println("Found is" + found);
+            if (found) {
+                System.out.println(msg);
+                if (msg.startsWith("FINALWRITE")) {
+                    System.out.println("Msg starts with");
+                    return;
                 }
-                count++;
+                int count = 0;
+                while (count < 5) {
+                    Thread.sleep(2000);
+                    System.out.println(this.obtainedLocks[idx] + "," + this.obtainedLocks[othIdx]);
+                    if (this.obtainedLocks[idx] && this.obtainedLocks[othIdx]) {
+                        System.out.println("Have obtained both locks");
+                        String obtainedAlllocks = "OBTAINEDALLLOCKS";
+                        dataOutputStream.writeInt(obtainedAlllocks.length());
+                        dataOutputStream.writeLong(lamportClockValue);
+                        dataOutputStream.writeBytes(obtainedAlllocks);
+                        dataOutputStream.close();
+                        return;
+                    }
+                    count++;
+                }
             }
             String[] msgs = msg.split("#");
             int time = Integer.parseInt(msgs[1]) * Integer.parseInt(msgs[2]);
             System.out.println("Couldnt obtain locks, adding back to queue " + time);
             Thread.sleep(time * 100);
             this.aborted[idx] = true;
+            String deferred = "DEFERRED";
+            dataOutputStream.writeInt(deferred.length());
+            dataOutputStream.writeLong(lamportClockValue);
+            dataOutputStream.writeBytes(deferred);
+            dataOutputStream.close();
+            in.close();
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
+
     }
 }

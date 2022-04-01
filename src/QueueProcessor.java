@@ -1,19 +1,16 @@
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class QueueProcessor implements Runnable {
     PriorityQueue<Message> requestQueue;
     String queueName;
-    HashSet<String> requests;
+    HashMap<String, Boolean> requests;
     ArrayList<String> otherServers;
     ArrayList<Boolean> currReq;
     private final boolean[] obtainedLocks = new boolean[]{false, false};
     String fullFilePath;
 
-    public QueueProcessor(PriorityQueue<Message> requestQueue, String queueName, HashSet<String> requests, ArrayList<String> otherServers, ArrayList<Boolean> currReq, String fullFilePath) {
+    public QueueProcessor(PriorityQueue<Message> requestQueue, String queueName, HashMap<String, Boolean> requests, ArrayList<String> otherServers, ArrayList<Boolean> currReq, String fullFilePath) {
         this.requestQueue = requestQueue;
         this.queueName = queueName;
         this.requests = requests;
@@ -53,7 +50,7 @@ public class QueueProcessor implements Runnable {
                             } else {
                                 System.out.println("**** " + msg);
                                 FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
-                                requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                                requests.put("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp, true);
                             }
                         } else {// if (!obtainedLocks[0] || !obtainedLocks[1]) {
                             RequestState state = new RequestState();
@@ -68,7 +65,7 @@ public class QueueProcessor implements Runnable {
                                 //Write To file
                                 System.out.println("**** " + msg);
                                 FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
-                                requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                                requests.put("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp, true);
                             }
                         }
                     } else if (msg.type.equals("SERVER")) {
@@ -78,15 +75,20 @@ public class QueueProcessor implements Runnable {
                         obtainedLocks[1] = false;
                         boolean flag = true;
                         String _reqMsg = "c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp;
-                        requests.add(_reqMsg);
+                        requests.put(_reqMsg, false);
                         while (flag) {
-                            flag = requests.contains(_reqMsg);
+                            flag = !requests.get(_reqMsg);
                             //Wait Till the Request Has been removed, queue cannot proceed further after handing over the lock.
                         }
-                        //Process msg as final write... now you dont have locks.. but you can only write once.
-                        Thread.sleep(2000);
-                        System.out.println("**** " + msg);
-                        FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
+                        if (requests.get(_reqMsg)) {
+                            //Process msg as final write... now you dont have locks.. but you can only write once.
+                            Thread.sleep(2000);
+                            System.out.println("**** " + msg);
+                            FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
+                        }
+                        else{
+                            requests.remove(_reqMsg);
+                        }
                     }
                 }
                 Thread.sleep(3000);

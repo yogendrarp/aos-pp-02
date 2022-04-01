@@ -7,17 +7,19 @@ public class ClientHandler implements Runnable {
     private final ArrayList<PriorityQueue<Message>> requestQueues;
     private final String filesInfo;
     private final LamportsClock lamportsClock;
-    private final HashSet<String> requests;
+    private final HashMap<String, Boolean> requests;
     private final String lockStatus = "HOLD";
     private final String path;
+    private RequestState state;
 
-    public ClientHandler(Socket socket, ArrayList<PriorityQueue<Message>> queue, String filesInfo, LamportsClock lamportsClock, HashSet<String> requests, String path) {
+    public ClientHandler(Socket socket, ArrayList<PriorityQueue<Message>> queue, String filesInfo, LamportsClock lamportsClock, HashMap<String, Boolean> requests, String path, RequestState state) {
         this.clientSocket = socket;
         this.requestQueues = queue;
         this.filesInfo = filesInfo;
         this.lamportsClock = lamportsClock;
         this.requests = requests;
         this.path = path;
+        this.state = state;
     }
 
     public void run() {
@@ -26,6 +28,7 @@ public class ClientHandler implements Runnable {
         try {
             out = new DataOutputStream(clientSocket.getOutputStream());
             in = new DataInputStream(clientSocket.getInputStream());
+            state.aborted = false;
             int length = 0;
             length = in.readInt();
             long clock = in.readLong();
@@ -52,7 +55,7 @@ public class ClientHandler implements Runnable {
                     lamportsClock.clockValue++;
                     boolean flag = true;
                     while (flag) {
-                        boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
+                        boolean containsData = requests.containsKey("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         if (containsData) {
                             flag = false;
                             requests.remove("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
@@ -74,25 +77,29 @@ public class ClientHandler implements Runnable {
                     lamportsClock.clockValue++;
                     boolean flag = true;
                     while (flag) {
-                        boolean containsData = requests.contains("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
-                        if (containsData) {
-                            //Send request back to the stream and enquire if it obtained a lock from other server and then write to file.
-                            System.out.println("Other Server request can be processed, handing over the lock");
-                            String successMsg = "LOCK";
-                            out.writeInt(successMsg.length());
-                            out.writeBytes(successMsg);
-                            while (true) {
-                                length = 0;
-                                length = in.readInt();
-                                long lcClock = in.readLong();
-                                if (length > 0) {
-                                    byte[] successmsg = new byte[length];
-                                    in.readFully(successmsg);
-                                    System.out.println(new String(successmsg));
-                                    break;
+                        String _key = "c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp;
+                        boolean containsData = requests.containsKey(_key);
+                        if (containsData && requests.get(_key)) {
+                            try {
+                                //Send request back to the stream and enquire if it obtained a lock from other server and then write to file.
+                                System.out.println("Other Server request can be processed, handing over the lock");
+                                String successMsg = "LOCK";
+                                out.writeInt(successMsg.length());
+                                out.writeBytes(successMsg);
+                                while (true) {
+                                    length = in.readInt();
+                                    long lcClock = in.readLong();
+                                    if (length > 0) {
+                                        byte[] successmsg = new byte[length];
+                                        in.readFully(successmsg);
+                                        System.out.println(new String(successmsg));
+                                        requests.put("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp, false);
+                                        break;
+                                    }
                                 }
+                            } catch (Exception e) {
+
                             }
-                            requests.remove("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
                         }
                     }
                 } else if (messageTokens[0].equals("FINALWRITE")) {
@@ -125,12 +132,7 @@ public class ClientHandler implements Runnable {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            try {
-                in.close();
-                out.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            state.aborted = true;
         }
     }
 

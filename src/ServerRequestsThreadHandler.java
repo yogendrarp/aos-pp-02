@@ -36,6 +36,8 @@ public class ServerRequestsThreadHandler implements Runnable {
             server2.join();
             if (aborted[idx1] || aborted[idx2]) {
                 state.aborted = true;
+                server1.interrupt();
+                server2.interrupt();
             }
             System.out.println("Both the threads finished exec");
         } catch (InterruptedException e) {
