@@ -38,8 +38,9 @@ public class Server1 {
                 Socket client = server.accept();
                 ClientHandler clientHandler = new ClientHandler(client, requestQueues, filesInfo, lamportsClock, requests, path);
                 new Thread(clientHandler).start();
+                Thread.sleep(1000);
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
             if (server != null) {
