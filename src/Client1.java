@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class Client1 {
-    static String[] servers = new String[]{"localhost:5000", "localhost:5001", "localhost:5002" };
+    static String[] servers = new String[]{"localhost:5000", "localhost:5001", "localhost:5002"};
     static ArrayList<String> files;
     static String path = "D:\\Code\\aos-pp-02-ra\\";
     static String citiesFile = "citiestexas.txt";
@@ -37,8 +37,8 @@ public class Client1 {
                 dataOutputStream.writeInt(msg.length());
                 dataOutputStream.writeLong(lamportClockValue);
                 dataOutputStream.writeBytes(msg);
-                Thread.sleep(new Random().nextInt(4) * 1000);
-                while (true) {
+                int count = 0;
+                while (count < 10) {
                     int length = in.readInt();
                     if (length > 0) {
                         byte[] successMsg = new byte[length];
@@ -46,11 +46,17 @@ public class Client1 {
                         System.out.println(new String(successMsg));
                         break;
                     }
+                    Thread.sleep(1000);
+                    count++;
+                    System.out.println(count + "," + length);
+                }
+                if (count >= 10) {
+                    System.out.println("timedout");
                 }
             } catch (UnknownHostException | InterruptedException e) {
                 e.printStackTrace();
             }
-            Thread.sleep(3000);
+            Thread.sleep(new Random().nextInt(15) * 100);
         }
     }
 

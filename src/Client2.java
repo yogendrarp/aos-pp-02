@@ -37,20 +37,23 @@ public class Client2 {
                 dataOutputStream.writeInt(msg.length());
                 dataOutputStream.writeLong(lamportClockValue);
                 dataOutputStream.writeBytes(msg);
-                Thread.sleep(new Random().nextInt(4) * 1000);
-                while (true) {
+                int count=0;
+                while (count<10) {
                     int length = in.readInt();
                     if (length > 0) {
                         byte[] successMsg = new byte[length];
                         in.readFully(successMsg);
                         System.out.println(new String(successMsg));
                         break;
+                    }else{
+                        Thread.sleep(1000);
+                        count++;
                     }
                 }
             } catch (UnknownHostException | InterruptedException e) {
                 e.printStackTrace();
             }
-            Thread.sleep(3000);
+            Thread.sleep(new Random().nextInt(15)*100);
         }
     }
 

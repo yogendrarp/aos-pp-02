@@ -53,7 +53,7 @@ public class QueueProcessor implements Runnable {
                             ServerRequestsThreadHandler serverRequestsThreadHandler = new ServerRequestsThreadHandler(msgString, otherServers, lamportsClock, obtainedLocks);
                             Thread sRqTHThread = new Thread(serverRequestsThreadHandler);
                             sRqTHThread.start();
-                            sRqTHThread.join();
+                            //sRqTHThread.join();
                             System.out.println("**** " + msg);
                             FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                             requests.add("c:" + msg.clientId + ",f:" + msg.fileName + ",t:" + msg.timeStamp);
@@ -74,7 +74,6 @@ public class QueueProcessor implements Runnable {
                         FileWriter.AppendToFile(fullFilePath, msg.clientId + ", " + msg.timeStamp + ", " + msg.message);
                     }
                 }
-                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
