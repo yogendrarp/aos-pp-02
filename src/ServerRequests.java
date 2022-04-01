@@ -2,9 +2,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.Random;
 
+/**
+ * Check with other server
+ */
 public class ServerRequests implements Runnable {
 
     String msg;
@@ -27,35 +28,48 @@ public class ServerRequests implements Runnable {
     public void run() {
         String _server = server.split(":")[0];
         int port = Integer.parseInt(server.split(":")[1]);
+        DataOutputStream dataOutputStream = null;
+        DataInputStream in = null;
         try (Socket socket = new Socket(_server, port)) {
-            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            DataInputStream in = new DataInputStream(socket.getInputStream());
+            dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            in = new DataInputStream(socket.getInputStream());
             dataOutputStream.writeInt(msg.length());
             dataOutputStream.writeLong(lamportClockValue);
             dataOutputStream.writeBytes(msg);
-            Thread.sleep(new Random().nextInt(4) * 1000);
+
             while (true) {
+                /**
+                 *Connect to one of the servers and inform that it has to write
+                 * once approved, send the facilitate that it has acquired both the servers permission
+                 */
                 int length = in.readInt();
                 System.out.println("Waiting for the response");
                 if (length > 0) {
                     byte[] successMsg = new byte[length];
                     in.readFully(successMsg);
                     System.out.println(new String(successMsg));
+                    System.out.println("Obtained lock from" + server + " " + port);
                     this.obtainedLocks[idx] = true;
                     break;
                 }
             }
-            while (true) {
-                if (this.obtainedLocks[idx] && this.obtainedLocks[othIdx]){
-                    String obtainedAlllocks="OBTAINEDALLLOCKS";
-                    dataOutputStream.writeInt(obtainedAlllocks.length());
-                    dataOutputStream.writeLong(lamportClockValue);
-                    dataOutputStream.writeBytes(obtainedAlllocks);
-                    break;
-                }
-            }
+            String[] msgs = msg.split("#");
+            int time = Integer.parseInt(msgs[1]) * Integer.parseInt(msgs[2]);
+            Thread.sleep(time * 100);
+            System.out.println("Have obtained both locks");
+            String obtainedAlllocks = "OBTAINEDALLLOCKS";
+            dataOutputStream.writeInt(obtainedAlllocks.length());
+            dataOutputStream.writeLong(lamportClockValue);
+            dataOutputStream.writeBytes(obtainedAlllocks);
         } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                dataOutputStream.close();
+                in.close();
+            } catch (Exception e) {
+
+            }
         }
     }
 }
