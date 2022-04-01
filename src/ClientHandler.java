@@ -2,13 +2,17 @@ import java.io.*;
 import java.net.Socket;
 import java.util.*;
 
+/**
+ * Client handler implements Runnable to ensure, server can cater to n number of clients
+ */
 public class ClientHandler implements Runnable {
     private final Socket clientSocket;
+    //Add to queue respective of the file
     private final ArrayList<PriorityQueue<Message>> requestQueues;
     private final String filesInfo;
     private final LamportsClock lamportsClock;
+    //Hashset holds all processed requests
     private final HashSet<String> requests;
-    private final String lockStatus = "HOLD";
     private final String path;
 
     public ClientHandler(Socket socket, ArrayList<PriorityQueue<Message>> queue, String filesInfo, LamportsClock lamportsClock, HashSet<String> requests, String path) {
