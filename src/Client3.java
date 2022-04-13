@@ -3,15 +3,16 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
  * Client code for connecting to the servers on sockets
  */
 public class Client3 {
-    static String[] servers = new String[]{"localhost:5000", "localhost:5001", "localhost:5002"};
+    static String[] servers = new String[]{"dc01.utdallas.edu:5000", "dc02.utdallas.edu:5001", "dc03.utdallas.edu:5002"};
     static ArrayList<String> files;
-    static String path = "D:\\Code\\aos-pp-02-ra\\";
+    static String path = "/home/012/y/yr/yrp200001/aospp2/";
     static String citiesFile = "citiestexas.txt";
     static long lamportClockValue = 0;
 
@@ -20,7 +21,7 @@ public class Client3 {
 
         files = getHostedFileInformation();
 
-        List<String> cities = Files.readAllLines(Path.of(path + citiesFile));
+        List<String> cities = Files.readAllLines(Paths.get(path + citiesFile));
         /*
          * Each client creates 30 requests randomly to the server to a random file
          * */

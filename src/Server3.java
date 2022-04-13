@@ -8,8 +8,8 @@ public class Server3 {
 
     static ArrayList<String> files = new ArrayList<>(Arrays.asList("F1.txt", "F2.txt", "F3.txt", "F4.txt", "F5.txt", "F6.txt", "F7.txt", "F8.txt"));
     //Servers are aware of other two servers
-    static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("localhost:5000", "localhost:5001"));
-    static String path = "D:\\Code\\aos-pp-02-ra\\Server3\\";
+    static ArrayList<String> otherServers = new ArrayList<>(Arrays.asList("dc02.utdallas.edu:5000", "dc03.utdallas.edu:5001"));
+    static String path = "/home/012/y/yr/yrp200001/aospp2/Server3/";
     static HashSet<String> requests = new HashSet<>();
     static ArrayList<PriorityQueue<Message>> requestQueues = new ArrayList<PriorityQueue<Message>>();
     static LamportsClock lamportsClock = new LamportsClock();
